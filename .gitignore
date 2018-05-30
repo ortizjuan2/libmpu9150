@@ -1,0 +1,7 @@
+# gitignore file
+*.obj
+.vscode
+build/
+salida.txt
+
+
