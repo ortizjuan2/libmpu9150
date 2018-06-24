@@ -111,9 +111,21 @@ int MPU9150::init_sensor(int address){
     /*
      * Configure the gyroscopes’ full scale range
      * on bit [4:3] of GYRO_CONFIG Register
+     * and trigger self-test
      */
     regdata = wiringPiI2CReadReg8(fd, GYRO_CONFIG);
-    regdata &= ~INV_FS_SEL_250;
+    /* trigger self-test on bit [7:5] 
+     * use full scale 
+    */
+    // regdata |= 0xE0;
+    regdata |= 0xF8;
+    wiringPiI2CWriteReg8(fd, GYRO_CONFIG, regdata);
+    // waif 20 ms for self-test to finish
+    req.tv_nsec = 20 * 1000000L;
+    nanosleep(&req, (struct timespec *)NULL);
+    //regdata &= ~INV_FS_SEL_250;
+    // deactivate self test and put 250 dg/sec scale
+    regdata &= 0x07;
     wiringPiI2CWriteReg8(fd, GYRO_CONFIG, regdata);
     /*
      * Configure the accelerometer's full scale range
